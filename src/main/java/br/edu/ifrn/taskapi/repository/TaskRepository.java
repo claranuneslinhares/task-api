@@ -3,7 +3,6 @@ package br.edu.ifrn.taskapi.repository;
 import br.edu.ifrn.taskapi.model.Task;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,28 +17,18 @@ public class TaskRepository {
 
     private final AtomicLong sequencia = new AtomicLong();
 
-    public Task salvar(
-            String titulo,
-            String descricao,
-            LocalDate prazo
-    ) {
+    public Task salvar(Task task) {
 
         System.out.println(
                 "[REPOSITORY] Salvando tarefa em memória: "
-                        + titulo
+                        + task.getTitulo()
         );
 
-        Long id = sequencia.incrementAndGet();
+        if (task.getId() == null) {
+            task.setId(sequencia.incrementAndGet());
+        }
 
-        Task task = new Task(
-                id,
-                titulo,
-                descricao,
-                prazo,
-                false
-        );
-
-        banco.put(id, task);
+        banco.put(task.getId(), task);
 
         return task;
     }
@@ -56,8 +45,7 @@ public class TaskRepository {
     public Optional<Task> buscarPorId(Long id) {
 
         System.out.println(
-                "[REPOSITORY] Buscando tarefa por id: "
-                        + id
+                "[REPOSITORY] Buscando tarefa por id: " + id
         );
 
         return Optional.ofNullable(banco.get(id));

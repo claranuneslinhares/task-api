@@ -1,10 +1,11 @@
 package br.edu.ifrn.taskapi.service;
 
+import br.edu.ifrn.taskapi.dto.TaskRequestDTO;
+import br.edu.ifrn.taskapi.dto.TaskResponseDTO;
 import br.edu.ifrn.taskapi.model.Task;
 import br.edu.ifrn.taskapi.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -16,65 +17,45 @@ public class TaskService {
         this.repository = repository;
     }
 
-    public Task criar(
-            String titulo,
-            String descricao,
-            LocalDate prazo
-    ) {
+    public TaskResponseDTO criar(TaskRequestDTO dto) {
 
         System.out.println(
                 "[SERVICE] Validando regra de negócio para: "
-                        + titulo
+                        + dto.titulo()
         );
 
-        if (titulo == null || titulo.isBlank()) {
+        if (dto.titulo() == null || dto.titulo().isBlank()) {
             throw new IllegalArgumentException(
                     "O título da tarefa não pode ser vazio."
             );
         }
 
-        return repository.salvar(
-                titulo.trim(),
-                descricao,
-                prazo
+        Task tarefa = new Task(
+                dto.titulo().trim(),
+                dto.descricao(),
+                dto.prazo()
         );
+
+        Task salva = repository.salvar(tarefa);
+
+        return toResponseDTO(salva);
     }
 
-    public List<Task> listar() {
+    public List<TaskResponseDTO> listarTodas() {
 
-        System.out.println(
-                "[SERVICE] Solicitando lista de tarefas ao repository"
-        );
-
-        return repository.listarTodas();
+        return repository.listarTodas()
+                .stream()
+                .map(this::toResponseDTO)
+                .toList();
     }
 
-    public Task buscarPorId(Long id) {
+    private TaskResponseDTO toResponseDTO(Task tarefa) {
 
-        System.out.println(
-                "[SERVICE] Processando busca por id: "
-                        + id
+        return new TaskResponseDTO(
+                tarefa.getId(),
+                tarefa.getTitulo(),
+                tarefa.isConcluida(),
+                tarefa.getPrioridade()
         );
-
-        return repository.buscarPorId(id)
-                .orElseThrow(
-                        () -> new IllegalArgumentException(
-                                "Tarefa não encontrada: " + id
-                        )
-                );
-    }
-
-    public Task concluir(Long id) {
-
-        System.out.println(
-                "[SERVICE] Concluindo tarefa: "
-                        + id
-        );
-
-        Task task = buscarPorId(id);
-
-        task.setConcluida(true);
-
-        return task;
     }
 }

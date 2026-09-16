@@ -1,4 +1,9 @@
 package br.edu.ifrn.taskapi.dto;
 
-public class TaskResponseDTO {
+public record TaskResponseDTO(
+        Long id,
+        String titulo,
+        boolean concluida,
+        String prioridade
+) {
 }

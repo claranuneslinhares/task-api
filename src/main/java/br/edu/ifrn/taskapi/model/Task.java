@@ -11,13 +11,9 @@ public class Task {
     private boolean concluida;
     private String prioridade;
 
-    public Task(
-            Long id,
-            String titulo,
-            String descricao,
-            LocalDate prazo,
-            boolean concluida
-    ) {
+    public Task(Long id, String titulo, String descricao,
+                LocalDate prazo, boolean concluida) {
+
         this.id = id;
         this.titulo = titulo;
         this.descricao = descricao;
@@ -25,8 +21,16 @@ public class Task {
         this.concluida = concluida;
     }
 
+    public Task(String titulo, String descricao, LocalDate prazo) {
+        this(null, titulo, descricao, prazo, false);
+    }
+
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitulo() {
